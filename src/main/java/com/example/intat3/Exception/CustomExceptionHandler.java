@@ -1,0 +1,46 @@
+package com.example.intat3.Exception;
+
+import com.example.intat3.advices.ErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+
+@RestControllerAdvice
+public class CustomExceptionHandler  {
+
+    @ExceptionHandler(ResponseStatusException.class)
+    @ResponseBody
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex){
+        HttpStatusCode stats = ex.getStatusCode();
+        String reason = ex.getReason();
+        System.out.println(reason);
+        String error = ex.getBody().getTitle();
+        LocalDateTime timestamp = LocalDateTime.now();
+        String path = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI();
+        CustomErrorResponse response = new CustomErrorResponse(timestamp,stats.value(), error, reason, path);
+
+        return new ResponseEntity<>(response,stats);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, WebRequest request) {
+        ErrorResponse er = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Entity attributes validation failed!", request.getDescription(false));
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            er.addValidationError(error.getField(), error.getDefaultMessage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
+    }
+
+}

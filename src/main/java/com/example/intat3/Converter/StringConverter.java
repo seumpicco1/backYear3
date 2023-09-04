@@ -14,6 +14,6 @@ public class StringConverter implements AttributeConverter<String, String> {
         if(value==null){
             return null;
         }
-        return value.trim();
+        return value.trim().replaceAll("\\s","");
     }
 }
