@@ -29,55 +29,55 @@ public class UserService {
     @Autowired
     private Argon2PasswordEncoder passEncode;
 
-    public List<InfoUserDTO> getAllUser(){
+    public List<InfoUserDTO> getAllUser() {
         List<User> list = repository.getAllByOrderByRoleAscUsernameAsc();
-        return list.stream().map(x-> modelMapper.map(x, InfoUserDTO.class)).collect(Collectors.toList());
+        return list.stream().map(x -> modelMapper.map(x, InfoUserDTO.class)).collect(Collectors.toList());
     }
 
-    public User getUserId(Integer id){
+    public User getUserId(Integer id) {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(
-            HttpStatus.NOT_FOUND,"Users id " + id +  " " + "does not exist !!!"));
+                HttpStatus.NOT_FOUND, "Users id " + id + " " + "does not exist !!!"));
     }
 
-    public InfoUserDTO createUser (User user){
+    public InfoUserDTO createUser(User user) {
         String password = user.getPassword();
         String encodedPassword = passEncode.encode(password);
         System.out.println(encodedPassword);
         user.setPassword(encodedPassword);
-        try{
-            User result = repository.saveAndFlush(user);
-            repository.refresh(result);
-            return modelMapper.map(result, InfoUserDTO.class);
-        }catch (DataAccessException ex){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getRootCause().getMessage());
-        }
+        User result = repository.saveAndFlush(user);
+        repository.refresh(result);
+        return modelMapper.map(result, InfoUserDTO.class);
     }
 
     public boolean passwordChecker(OnlyUserDTO user) throws UserException {
         User info = repository.findByUsername(user.getUsername());
-        boolean check = passEncode.matches(user.getPassword(),info.getPassword());
-        if(!check){
-            throw new UserException("Password NOT Matched");
+        if (info != null) {
+            boolean check = passEncode.matches(user.getPassword(), info.getPassword());
+            if (!check) {
+                throw new UserException("Password NOT Matched");
+            }
+            return check;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username " + user.getUsername() + " does not exist !!!");
         }
-        return check;
+
     }
 
-
-    public User updateUser (int id, UpdateUserDTO newInfoUser) {
-        User oldInfoUser = repository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-        "User "+id+"does not exist!!"));
+    public InfoUserDTO updateUser(int id, UpdateUserDTO newInfoUser) {
+        User oldInfoUser = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "User " + id + " does not exist!!"));
         oldInfoUser.setUsername(newInfoUser.getUsername());
         oldInfoUser.setName(newInfoUser.getName());
         oldInfoUser.setEmail(newInfoUser.getEmail());
         oldInfoUser.setRole(newInfoUser.getRole());
         User updatedUser = repository.saveAndFlush(oldInfoUser);
         repository.refresh(updatedUser);
-
-        return updatedUser;
+        return modelMapper.map(updatedUser, InfoUserDTO.class);
     }
 
-    public void deleteUser(int id){
-            User u = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User id " + id +  " " + "does not exist !!!"));
-            repository.delete(u);
-        }
+    public void deleteUser(int id) {
+        User u = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User id " + id + " " + "does not exist !!!"));
+        repository.delete(u);
+    }
+
 }

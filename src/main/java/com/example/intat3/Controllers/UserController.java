@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Integer id, @RequestBody @Valid UpdateUserDTO user){
+    public InfoUserDTO updateUser(@PathVariable Integer id, @RequestBody @Valid UpdateUserDTO user){
         return service.updateUser(id, user);
     }
 

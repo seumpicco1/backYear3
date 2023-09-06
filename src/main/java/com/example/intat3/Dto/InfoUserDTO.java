@@ -14,6 +14,6 @@ public class InfoUserDTO {
     private String name;
     private String email;
     private Role role;
-    private ZonedDateTime createOn;
-    private ZonedDateTime updateOn;
+    private ZonedDateTime createdOn;
+    private ZonedDateTime updatedOn;
 }
