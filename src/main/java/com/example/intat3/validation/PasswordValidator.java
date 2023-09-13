@@ -13,11 +13,12 @@ public class PasswordValidator implements ConstraintValidator<PasswordValid,Stri
         String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!*]).*$";
         Pattern p = Pattern.compile(regex);
 
-        if(s==null||s.trim().isEmpty()  ) {
+        if(s==null||s.trim().isEmpty()) {
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext.buildConstraintViolationWithTemplate("must not be blank").addConstraintViolation();
             return false;
-        }else if(s.trim().length()>14||s.trim().length()<8){
+        }
+        else if(s.trim().length()>14||s.trim().length()<8){
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext.buildConstraintViolationWithTemplate("size must be between 8 and 14").addConstraintViolation();
             return false;

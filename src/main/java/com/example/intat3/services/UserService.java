@@ -60,7 +60,6 @@ public class UserService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username " + user.getUsername() + " does not exist !!!");
         }
-
     }
 
     public InfoUserDTO updateUser(int id, UpdateUserDTO newInfoUser) {

@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @GetMapping
+    @GetMapping("")
     public  List<InfoUserDTO> allUser(){
         return  service.getAllUser();
     }
@@ -40,7 +40,7 @@ public class UserController {
         }
     }
 
-    @PostMapping
+    @PostMapping("")
     public InfoUserDTO createUser(@RequestBody @Valid User user){
             InfoUserDTO success =  service.createUser(user);
             return success;
