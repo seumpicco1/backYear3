@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 
-@CrossOrigin(origins = {"http://25.18.60.149:5173", "http://intproj22.sit.kmutt.ac.th/at3"})
+@CrossOrigin
 @RestController
 @RequestMapping("/api/users")
 
@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @GetMapping("")
+    @GetMapping
     public  List<InfoUserDTO> allUser(){
         return  service.getAllUser();
     }
@@ -40,7 +40,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping
     public InfoUserDTO createUser(@RequestBody @Valid User user){
             InfoUserDTO success =  service.createUser(user);
             return success;

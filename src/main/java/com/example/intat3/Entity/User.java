@@ -32,7 +32,6 @@ public class User {
     @UniqueValid(usernameCheck = true, message = "does not unique")
     private String username;
 
-    @Size(min = 8, max = 14 ,message = "size must be between 8 and 14")
     @Convert(converter = StringConverter.class)
     @Column(name="password", nullable = false)
     @PasswordValid

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@CrossOrigin(origins = {"http://25.18.60.149:5173", "http://intproj22.sit.kmutt.ac.th/at3"})
+@CrossOrigin
 @RestController
 @RequestMapping("/api/announcements")
 
@@ -17,7 +17,7 @@ public class AnnouncementController {
     @Autowired
     private AnnouncementService service;
 
-    @GetMapping("")
+    @GetMapping
     public List<AllAnnouncementDto> getAllAnnouncement (@RequestParam(defaultValue = "admin") String mode){
         if(mode.equals("admin")) {
             return service.getAllAnnouncement();
@@ -32,7 +32,7 @@ public class AnnouncementController {
         return service.getAnnouncementById(id, count);
     }
 
-    @PostMapping("")
+    @PostMapping
     public AnnouncementDto createAnnouncement(@Valid @RequestBody UpdateAnnouncementDto ann){
         return service.createAnn(ann);
     }

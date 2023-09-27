@@ -28,6 +28,7 @@ public class ErrorResponse {
         }
         detail.add(new ValidationError(field, message));
     }
+
     @Getter
     @Setter
     @RequiredArgsConstructor
@@ -35,6 +36,4 @@ public class ErrorResponse {
         private final String field;
         private final String errorMessage;
     }
-
-
 }

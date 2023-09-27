@@ -2,6 +2,7 @@ package com.example.intat3.services;
 
 
 import com.example.intat3.Dto.InfoUserDTO;
+import com.example.intat3.Dto.JwtRequest;
 import com.example.intat3.Dto.OnlyUserDTO;
 import com.example.intat3.Dto.UpdateUserDTO;
 import com.example.intat3.Entity.User;

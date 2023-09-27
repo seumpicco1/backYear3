@@ -15,7 +15,7 @@ public class UniqueValidator implements ConstraintValidator<UniqueValid,String> 
     boolean nameCheck;
     boolean usernameCheck;
 
-    public UniqueValidator(UserRepository repository1) {
+    public   UniqueValidator(UserRepository repository1) {
         this.repository1 = repository1;
     }
 
