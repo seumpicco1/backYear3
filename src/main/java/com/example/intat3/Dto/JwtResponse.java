@@ -10,6 +10,6 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JwtResponse {
     @NonNull
-    private String accessToken;
+    private String token;
     private String refreshToken;
 }
