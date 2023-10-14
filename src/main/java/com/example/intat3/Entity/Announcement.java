@@ -1,6 +1,5 @@
 package com.example.intat3.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -47,4 +45,7 @@ public class Announcement {
     @Column(name = "viewCount")
     private Integer viewer;
 
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 }

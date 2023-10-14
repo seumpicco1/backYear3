@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,7 +20,6 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/users")
-
 public class UserController {
 
     @Autowired
@@ -58,7 +58,12 @@ public class UserController {
 
     @DeleteMapping ("/{id}")
     public void deleteUser(@PathVariable Integer id){
-        service.deleteUser(id);
+        String username = getUsername();
+        service.deleteUser(username,id);
+    }
+
+    public String getUsername(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 }

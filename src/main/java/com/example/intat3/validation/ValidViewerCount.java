@@ -24,13 +24,13 @@ public class ValidViewerCount implements ConstraintValidator<ViewValid, Integer>
     @Override
     public boolean isValid(Integer ann, ConstraintValidatorContext constraintValidatorContext) {
 
-        if (ann > service.getAnnouncementById(id, true).getViewer()  && ann != null) {
-            System.out.println(true);
+//        if (ann > service.getAnnouncementById(id, true).getViewer()  && ann != null) {
+//            System.out.println(true);
             return true;
 
-        } else {
-            return false;
-        }
+//        } else {
+//            return false;
+//        }
 
     }
 }

@@ -3,9 +3,10 @@ package com.example.intat3.services;
 import com.example.intat3.Dto.*;
 import com.example.intat3.Entity.Announcement;
 import com.example.intat3.Entity.Category;
+import com.example.intat3.Entity.User;
 import com.example.intat3.repositories.AnnouncementRepository;
-
 import com.example.intat3.repositories.CategoryRepository;
+import com.example.intat3.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -13,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,13 +25,24 @@ public class AnnouncementService {
     @Autowired
     private AnnouncementRepository announcementrepository;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
     private ModelMapper modelMapper;
 
-    public AnnouncementDto getAnnouncementById(Integer announcementId, boolean count ) {
+    public AnnouncementDto getAnnouncementById(Integer announcementId, boolean count, String username  ) {
         Announcement a = announcementrepository.findById(announcementId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Announcement id " + announcementId +  " " + "does not exist !!!"));
+        System.out.println(username);
+        User user = null;
+        if(!username.contains("anonymousUser")){
+            user = userRepository.findByUsername(username);
+            if(!a.getUser().getId().equals(user.getId())){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
+            }
+        }
+
         if (count) {
             a.setViewer(a.getViewer()+1);
             announcementrepository.saveAndFlush(a);
@@ -47,22 +57,29 @@ public class AnnouncementService {
         return aa.stream().map(x->modelMapper.map(x, AllAnnouncementDto.class)).collect(Collectors.toList());
     }
 
-    public AnnouncementDto createAnn( UpdateAnnouncementDto upAnn) {
+    public List<AllAnnouncementDto> getAllAnnouncementByUser(String username){
+        User user = userRepository.findByUsername(username);
+        List<Announcement>list =  announcementrepository.findAllByUser(user);
+        Collections.reverse(list);
+        return list.stream().map(x -> modelMapper.map(x,AllAnnouncementDto.class)).collect(Collectors.toList());
+    }
+
+    public AnnouncementDto createAnn( UpdateAnnouncementDto upAnn, String username) {
         if (upAnn.getAnnouncementDisplay() == null) {
             upAnn.setAnnouncementDisplay("N");
         }
-
         else {
             upAnn.setAnnouncementDisplay(upAnn.getAnnouncementDisplay());
         }
-
         if(upAnn.getViewer() == null){
             upAnn.setViewer(0);
-
         }
+        User user = userRepository.findByUsername(username);
         Category cat = categoryRepository.findById(upAnn.getCategoryId()).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Category id " + upAnn.getCategoryId() + " does not exist !!!"));
+
         Announcement aa = modelMapper.map(upAnn,Announcement.class);
         aa.setCategory(cat);
+        aa.setUser(user);
         announcementrepository.saveAndFlush(aa);
         return modelMapper.map(aa,AnnouncementDto.class);
     }
@@ -110,12 +127,13 @@ public class AnnouncementService {
         all.forEach(x -> {
             ZonedDateTime current = ZonedDateTime.now();
             if(mode.equals("active")){
-                if((x.getPublishDate()==null || current.compareTo(x.getPublishDate())>0) && (x.getCloseDate()==null||current.compareTo(x.getCloseDate())<0)){
+                if((x.getPublishDate()==null || current.compareTo(x.getPublishDate())>0) && (x.getCloseDate()==null|| current.compareTo(x.getCloseDate())<0)){
                     filtered.add(x);
                 }
             } else {
                 if((x.getCloseDate() != null && current.compareTo(x.getCloseDate())>0) && x.getAnnouncementDisplay().equals("Y") ){
                     filtered.add(x);
+                    System.out.println("mode");
                 }
             }
         });

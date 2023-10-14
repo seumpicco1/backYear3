@@ -3,7 +3,6 @@ package com.example.intat3.Dto;
 import com.example.intat3.Converter.StringConverter;
 import com.example.intat3.Entity.Role;
 import com.example.intat3.validation.UniqueValid;
-import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

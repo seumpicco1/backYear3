@@ -13,12 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
@@ -81,8 +76,8 @@ public class JwtAuthenticationController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         try {
             Claims claims = Jwts.parser().setSigningKey(jwtProperties.getSecretKey()).parseClaimsJws(refreshToken).getBody();
-            System.out.println(claims.get("role"));
-            if(claims.get("role") .equals("refresh")){
+            System.out.println(claims.get("token"));
+            if(claims.get("token") .equals("refreshToken")){
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
 
                 return ResponseEntity.ok(new JwtResponse(newAccessToken));

@@ -3,7 +3,6 @@ package com.example.intat3.repositories;
 import com.example.intat3.Entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 

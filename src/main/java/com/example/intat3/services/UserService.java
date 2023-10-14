@@ -2,15 +2,14 @@ package com.example.intat3.services;
 
 
 import com.example.intat3.Dto.InfoUserDTO;
-import com.example.intat3.Dto.JwtRequest;
 import com.example.intat3.Dto.OnlyUserDTO;
 import com.example.intat3.Dto.UpdateUserDTO;
 import com.example.intat3.Entity.User;
 import com.example.intat3.Exception.UserException;
+import com.example.intat3.repositories.AnnouncementRepository;
 import com.example.intat3.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,9 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     private UserRepository repository;
+
+    @Autowired
+    private AnnouncementRepository announcementRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -75,8 +77,10 @@ public class UserService {
         return modelMapper.map(updatedUser, InfoUserDTO.class);
     }
 
-    public void deleteUser(int id) {
-        User u = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User id " + id + " " + "does not exist !!!"));
+    public void deleteUser(String username,int targetId) {
+        User admin = repository.findByUsername(username);
+        User u = repository.findById(targetId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User id " + targetId + " " + "does not exist !!!"));
+        announcementRepository.updateAnnouncementFromAnnouncerToAdmin(admin.getId(),u.getId());
         repository.delete(u);
     }
 

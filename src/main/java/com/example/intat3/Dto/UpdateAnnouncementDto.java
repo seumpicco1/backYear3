@@ -1,14 +1,11 @@
 package com.example.intat3.Dto;
 import com.example.intat3.validation.DateValid;
-import com.example.intat3.validation.ViewValid;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -33,7 +30,8 @@ public class UpdateAnnouncementDto {
     @NotNull(message = "must not be null") @Min(value = 1, message = "does not exists") @Max(value = 4, message = "does not exists")
     private Integer categoryId;
 
-     @Min(value = 0, message = "must be a positive value")
+    @Min(value = 0, message = "must be a positive value")
     private Integer viewer;
+
 
 }

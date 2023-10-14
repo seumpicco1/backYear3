@@ -3,15 +3,16 @@ package com.example.intat3.Entity;
 import com.example.intat3.Converter.StringConverter;
 import com.example.intat3.validation.PasswordValid;
 import com.example.intat3.validation.UniqueValid;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.validation.constraints.*;
-import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -61,5 +62,8 @@ public class User {
     @Column(name = "updatedOn" ,insertable = false, updatable = false)
     private ZonedDateTime updatedOn;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Announcement> announcementsList;
 
 }

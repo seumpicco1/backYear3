@@ -5,6 +5,7 @@ import com.example.intat3.Dto.*;
 import com.example.intat3.services.AnnouncementService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,23 +19,26 @@ public class AnnouncementController {
     private AnnouncementService service;
 
     @GetMapping
-    public List<AllAnnouncementDto> getAllAnnouncement (@RequestParam(defaultValue = "admin") String mode){
-        if(mode.equals("admin")) {
+    public List<AllAnnouncementDto> getAllAnnouncement (){
+        boolean isAdmin = isAdminChecker();
+        String username = getUsernameUser();
+        if(isAdmin) {
             return service.getAllAnnouncement();
-        }else if(mode.equals("active")){
-            return service.getAnnByDisplay(mode,0);
-        }else{
-            return service.getAnnByDisplay(mode,0);
+        }else {
+            return service.getAllAnnouncementByUser(username);
         }
     }
+
     @GetMapping("/{id}")
     public AnnouncementDto getById(@PathVariable Integer id, @RequestParam(defaultValue = "false") boolean count){
-        return service.getAnnouncementById(id, count);
+        String username = getUsernameUser();
+        return service.getAnnouncementById(id, count, username);
     }
 
     @PostMapping
     public AnnouncementDto createAnnouncement(@Valid @RequestBody UpdateAnnouncementDto ann){
-        return service.createAnn(ann);
+        String username = getUsernameUser();
+        return service.createAnn(ann, username);
     }
 
     @DeleteMapping ("/{id}")
@@ -56,4 +60,11 @@ public class AnnouncementController {
         return service.getAllPageAnn(page, size, mode ,category);
     }
 
+    public boolean isAdminChecker(){
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> role.equals("ROLE_ADMIN"));
+    }
+
+    public String getUsernameUser(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 }

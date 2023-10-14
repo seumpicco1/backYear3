@@ -6,9 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.example.intat3.Entity.User;
 import com.example.intat3.Properties.JwtProperties;
+import com.example.intat3.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ public class JwtTokenUtil implements Serializable {
 
 @Autowired
 private JwtProperties jwtProperties;
+
+@Autowired
+private UserRepository userRepository;
 
     //retrieve username from jwt token
     public String getUsernameFromToken(String token) {
@@ -49,14 +53,17 @@ private JwtProperties jwtProperties;
 
     //generate token for user
     public String generateAccessToken(UserDetails userDetails) {
-        System.out.println(userDetails.getPassword());
+//        System.out.println(userDetails.getPassword());
+        User user = userRepository.findByUsername(userDetails.getUsername());
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role",user.getRole());
+        claims.put("token","accessToken");
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role","refresh");
+        claims.put("token","refreshToken");
         return doGenerateRefreshToken(claims, userDetails.getUsername());
     }
 
