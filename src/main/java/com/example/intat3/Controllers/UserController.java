@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserId(@PathVariable Integer id){
+    public InfoUserDTO getUserId(@PathVariable Integer id){
         return service.getUserId(id);
     }
 

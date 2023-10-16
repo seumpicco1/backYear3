@@ -14,9 +14,9 @@ import java.util.List;
 public interface AnnouncementRepository extends JpaRepository<Announcement,Integer> {
     List<Announcement> findAllByCategory(Category category);
 
-    List<Announcement> findAllByUser(User user);
+    List<Announcement> findAllByAnnouncementOwner(User user);
 
     @Modifying @Transactional
-    @Query("update Announcement a set a.user.id = :adminId where a.user.id = :announcerId")
-    void updateAnnouncementFromAnnouncerToAdmin(@Param("adminId") int adminId, @Param("announcerId") int announcerId);
+    @Query("UPDATE Announcement a SET a.announcementOwner = :adminUsername WHERE a.announcementOwner = :announcerUsername")
+    void updateAnnouncementFromAnnouncerToAdmin(User adminUsername, User announcerUsername);
 }

@@ -46,6 +46,6 @@ public class Announcement {
     private Integer viewer;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    @JoinColumn(name = "announcementOwner", referencedColumnName = "username")
+    private User announcementOwner;
 }

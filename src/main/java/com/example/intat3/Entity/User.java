@@ -63,7 +63,7 @@ public class User {
     private ZonedDateTime updatedOn;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "announcementOwner", cascade = CascadeType.ALL)
     private List<Announcement> announcementsList;
 
 }

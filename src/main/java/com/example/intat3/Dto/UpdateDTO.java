@@ -24,5 +24,9 @@ public class UpdateDTO {
     @JsonIgnore
     private  CategoryDTO category;
     private Integer viewer;
+    private InfoUserDTO announcementOwner;
+    public String getAnnouncementOwner(){
+        return announcementOwner == null ? "-" : announcementOwner.getUsername();
+    }
 
 }

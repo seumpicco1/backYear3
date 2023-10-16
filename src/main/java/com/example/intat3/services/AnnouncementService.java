@@ -3,6 +3,7 @@ package com.example.intat3.services;
 import com.example.intat3.Dto.*;
 import com.example.intat3.Entity.Announcement;
 import com.example.intat3.Entity.Category;
+import com.example.intat3.Entity.Role;
 import com.example.intat3.Entity.User;
 import com.example.intat3.repositories.AnnouncementRepository;
 import com.example.intat3.repositories.CategoryRepository;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,8 +40,11 @@ public class AnnouncementService {
         User user = null;
         if(!username.contains("anonymousUser")){
             user = userRepository.findByUsername(username);
-            if(!a.getUser().getId().equals(user.getId())){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
+            if(user.getRole().equals(Role.admin)){
+                return modelMapper.map(a,AnnouncementDto.class);
+            }
+            else if(!a.getAnnouncementOwner().getUsername().equals(user.getUsername())){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
             }
         }
 
@@ -51,15 +56,16 @@ public class AnnouncementService {
         return modelMapper.map(a,AnnouncementDto.class);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AllAnnouncementDto> getAllAnnouncement() {
         List<Announcement> aa = announcementrepository.findAll();
         Collections.reverse(aa);
         return aa.stream().map(x->modelMapper.map(x, AllAnnouncementDto.class)).collect(Collectors.toList());
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','ANNOUNCER')")
     public List<AllAnnouncementDto> getAllAnnouncementByUser(String username){
         User user = userRepository.findByUsername(username);
-        List<Announcement>list =  announcementrepository.findAllByUser(user);
+        List<Announcement>list =  announcementrepository.findAllByAnnouncementOwner(user);
         Collections.reverse(list);
         return list.stream().map(x -> modelMapper.map(x,AllAnnouncementDto.class)).collect(Collectors.toList());
     }
@@ -79,27 +85,50 @@ public class AnnouncementService {
 
         Announcement aa = modelMapper.map(upAnn,Announcement.class);
         aa.setCategory(cat);
-        aa.setUser(user);
+        aa.setAnnouncementOwner(user);
         announcementrepository.saveAndFlush(aa);
         return modelMapper.map(aa,AnnouncementDto.class);
     }
 
-    public void deleteAnn(int id){
+    public void deleteAnn(int id , String username){
         Announcement a = announcementrepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Announcement id " + id +  " " + "does not exist !!!"));
+        User user = null;
+        if(!username.contains("anonymousUser")){
+            user = userRepository.findByUsername(username);
+            if(user.getRole().equals(Role.admin)){
+                announcementrepository.delete(a);
+                return;
+            }else if(!a.getAnnouncementOwner().getUsername().equals(user.getUsername())){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
+            }
+        }
         announcementrepository.delete(a);
+
     }
 
-    public UpdateDTO updateAnn(int id, UpdateAnnouncementDto newAnn) {
+    public UpdateDTO updateAnn(int id, UpdateAnnouncementDto newAnn, String username) {
         Announcement curAnn = announcementrepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Announcement id " + id + " " + "does not exist !!!"));
         Category cat = categoryRepository.findById(newAnn.getCategoryId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category id " + newAnn.getCategoryId() + " does not exist !!!"));
+        User user = null;
         Announcement nAnn = modelMapper.map(newAnn,Announcement.class);
-            curAnn.setCategory(cat);
-            curAnn.setAnnouncementTitle(nAnn.getAnnouncementTitle());
-            curAnn.setAnnouncementDescription(nAnn.getAnnouncementDescription());
-            curAnn.setPublishDate(nAnn.getPublishDate());
-            curAnn.setCloseDate(nAnn.getCloseDate());
-            curAnn.setAnnouncementDisplay(nAnn.getAnnouncementDisplay());
-            curAnn.setViewer(nAnn.getViewer());
+
+        curAnn.setCategory(cat);
+        curAnn.setAnnouncementTitle(nAnn.getAnnouncementTitle());
+        curAnn.setAnnouncementDescription(nAnn.getAnnouncementDescription());
+        curAnn.setPublishDate(nAnn.getPublishDate());
+        curAnn.setCloseDate(nAnn.getCloseDate());
+        curAnn.setAnnouncementDisplay(nAnn.getAnnouncementDisplay());
+//            curAnn.setViewer(nAnn.getViewer());
+        if(!username.contains("anonymousUser")){
+            user = userRepository.findByUsername(username);
+            if(user.getRole().equals(Role.admin)){
+                announcementrepository.saveAndFlush(curAnn) ;
+                return  modelMapper.map(curAnn,UpdateDTO.class);
+            }
+            else if(!curAnn.getAnnouncementOwner().getUsername().equals(user.getUsername())){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
+            }
+        }
         announcementrepository.saveAndFlush(curAnn) ;
         return  modelMapper.map(curAnn,UpdateDTO.class);
     }
@@ -114,6 +143,7 @@ public class AnnouncementService {
         return modelMapper.map(ann, PageDTO.class);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','ANONYMOUS','ANNOUNCER')")
     public List<AllAnnouncementDto> getAnnByDisplay(String mode, int cat){
         List<Announcement> all = new ArrayList<>();
         if(cat==0){
@@ -133,7 +163,7 @@ public class AnnouncementService {
             } else {
                 if((x.getCloseDate() != null && current.compareTo(x.getCloseDate())>0) && x.getAnnouncementDisplay().equals("Y") ){
                     filtered.add(x);
-                    System.out.println("mode");
+//                    System.out.println("mode");
                 }
             }
         });

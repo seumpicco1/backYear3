@@ -20,4 +20,10 @@ public class AllAnnouncementDto {
     @JsonIgnore
     private  CategoryDTO category;
     private Integer viewer;
+
+//    @JsonIgnore
+    private InfoUserDTO announcementOwner;
+    public String getAnnouncementOwner(){
+        return announcementOwner == null ? "-" : announcementOwner.getUsername();
+    }
 }

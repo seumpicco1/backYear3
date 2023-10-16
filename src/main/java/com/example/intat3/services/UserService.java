@@ -37,9 +37,10 @@ public class UserService {
         return list.stream().map(x -> modelMapper.map(x, InfoUserDTO.class)).collect(Collectors.toList());
     }
 
-    public User getUserId(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(
+    public InfoUserDTO getUserId(Integer id) {
+        User user =  repository.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Users id " + id + " " + "does not exist !!!"));
+        return modelMapper.map(user, InfoUserDTO.class);
     }
 
     public InfoUserDTO createUser(User user) {
@@ -78,10 +79,17 @@ public class UserService {
     }
 
     public void deleteUser(String username,int targetId) {
+        System.out.println(username);
         User admin = repository.findByUsername(username);
         User u = repository.findById(targetId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User id " + targetId + " " + "does not exist !!!"));
-        announcementRepository.updateAnnouncementFromAnnouncerToAdmin(admin.getId(),u.getId());
-        repository.delete(u);
+        System.out.println(u.getUsername());
+        if(!admin.getUsername().equals(u.getUsername())){
+            announcementRepository.updateAnnouncementFromAnnouncerToAdmin(admin,u);
+            repository.delete(u);
+        }else{
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
+        }
+
     }
 
 }

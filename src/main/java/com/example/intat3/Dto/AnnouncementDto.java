@@ -16,11 +16,18 @@ public class AnnouncementDto {
     private ZonedDateTime closeDate;
     private String announcementDisplay ;
     private Integer categoryId ;
-    public  String getannouncementCategory (){
+    public  String getAnnouncementCategory (){
         return  category == null ? "-" : category.getName();
     }
     @JsonIgnore
     private  CategoryDTO category;
     private Integer viewer;
+
+//    @JsonIgnore
+
+    private InfoUserDTO announcementOwner;
+    public String getAnnouncementOwner(){
+        return announcementOwner == null ? "-" : announcementOwner.getUsername();
+    }
 
 }

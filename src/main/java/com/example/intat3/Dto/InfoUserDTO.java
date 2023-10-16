@@ -16,4 +16,7 @@ public class InfoUserDTO {
     private Role role;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;
+//    public String getU(){
+//        return username;
+//    }
 }
