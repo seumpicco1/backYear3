@@ -31,9 +31,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         logger.info(request.getRequestURL().toString());
         logger.info(request.getMethod());
         String requestTokenHeader = request.getHeader("Authorization");
-//        System.out.println(request.getHeader("Authorization"));
         String username = null;
-//        String role = null;
         String jwtToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token

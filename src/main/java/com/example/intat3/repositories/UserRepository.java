@@ -14,6 +14,8 @@ public interface UserRepository extends CustomUserRepository<User, Integer> {
     boolean existsByName(String name);
     boolean existsByEmail(String email);
 
+//    User findUserByUsername(String username);
+
     @Query("SELECT CASE WHEN COUNT(u) > 1 THEN true ELSE false END FROM User u WHERE u.id = :userId OR u.username = :username")
     boolean doesUserExistByUsername(@Param("userId") Integer userId, @Param("username") String username);
     @Query("SELECT CASE WHEN COUNT(u) > 1 THEN true ELSE false END FROM User u WHERE u.id = :userId OR u.name = :name")

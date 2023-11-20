@@ -19,4 +19,7 @@ public interface AnnouncementRepository extends JpaRepository<Announcement,Integ
     @Modifying @Transactional
     @Query("UPDATE Announcement a SET a.announcementOwner = :adminUsername WHERE a.announcementOwner = :announcerUsername")
     void updateAnnouncementFromAnnouncerToAdmin(User adminUsername, User announcerUsername);
+
+    @Query("SELECT a FROM Announcement a WHERE (a.publishDate < NOW() OR a.publishDate = NULL) AND a.announcementDisplay = 'Y' AND a.notification = 'N'")
+    List<Announcement> announcementPublishCheck();
 }

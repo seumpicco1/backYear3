@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Notification</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .notification-section {
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    .notification-section h1 {
+      color: #333;
+    }
+
+    .footer-section {
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+    }
+
+    .unsubscribe-link {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Notification Email Content -->
+<div class="email-container">
+  <div class="notification-section">
+    <h1>Notification Email</h1>
+    <p>Dear ${email},</p>
+    <p>This is a notification email from category "${ann}" of SIT Announcement System.</p>
+    <p>Thank you for being a part of our community!</p>
+  </div>
+
+  <!-- Footer with Unsubscribe Link -->
+  <div class="footer-section">
+    <p>You received this email because you are subscribed to our notifications.</p>
+    <p><a href="${unsub}" class="unsubscribe-link">Unsubscribe</a> from our emails.</p>
+  </div>
+</div>
+
+</body>
+
+</html>

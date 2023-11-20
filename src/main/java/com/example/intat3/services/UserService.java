@@ -43,6 +43,15 @@ public class UserService {
         return modelMapper.map(user, InfoUserDTO.class);
     }
 
+    public InfoUserDTO getUserByUsername(String username){
+        try {
+            User user =  repository.findByUsername(username);
+            return modelMapper.map(user, InfoUserDTO.class);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,e.getMessage());
+        }
+    }
+
     public InfoUserDTO createUser(User user) {
         String password = user.getPassword();
         String encodedPassword = passEncode.encode(password);

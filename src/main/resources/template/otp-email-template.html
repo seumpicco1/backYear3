@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Email</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .otp-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .instruction {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .footer-section {
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+        }
+
+        .unsubscribe-link {
+            color: #fff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- OTP Email Content -->
+<div class="email-container">
+    <p>Dear ${email},</p>
+    <p>Here is your One-Time Password (OTP) for verification:</p>
+    <div class="otp-code">${otp}</div>
+    <p class="instruction">Please use this OTP to complete your verification process. Do not share this code with anyone.</p>
+
+    <!-- Footer with Unsubscribe Link -->
+    <!-- <div class="footer-section">
+      <p>You received this email because you requested an OTP for verification.</p>
+      <p><a href="[Unsubscribe_Link]" class="unsubscribe-link">Unsubscribe</a> from our emails.</p>
+    </div> -->
+  </div>
+
+</body>
+
+</html>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,14 @@ public class CustomExceptionHandler  {
             er.addValidationError(error.getField(), error.getDefaultMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    @ResponseStatus(value = HttpStatus.PAYLOAD_TOO_LARGE)
+    public ResponseEntity<ErrorResponse> handleMultipartException(MultipartException ex, WebRequest request) {
+        ErrorResponse er = new ErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE.value(), "Entity attributes validation failed!", request.getDescription(false));
+            er.addValidationError(ex.getMessage() ,ex.getCause().getCause().getMessage());
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(er);
     }
 
 }

@@ -32,13 +32,15 @@ public class AnnouncementService {
     private CategoryRepository categoryRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private EmailService emailService;
 
     public AnnouncementDto getAnnouncementById(Integer announcementId, boolean count, String username  ) {
         Announcement a = announcementrepository.findById(announcementId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Announcement id " + announcementId +  " " + "does not exist !!!"));
         System.out.println(username);
         User user = null;
-        if(!username.contains("anonymousUser")){
+        if(!username.contains("anonymousUser")&& username != null){
             user = userRepository.findByUsername(username);
             if(user.getRole().equals(Role.admin)){
                 return modelMapper.map(a,AnnouncementDto.class);
@@ -118,7 +120,6 @@ public class AnnouncementService {
         curAnn.setPublishDate(nAnn.getPublishDate());
         curAnn.setCloseDate(nAnn.getCloseDate());
         curAnn.setAnnouncementDisplay(nAnn.getAnnouncementDisplay());
-//            curAnn.setViewer(nAnn.getViewer());
         if(!username.contains("anonymousUser")){
             user = userRepository.findByUsername(username);
             if(user.getRole().equals(Role.admin)){
@@ -130,6 +131,7 @@ public class AnnouncementService {
             }
         }
         announcementrepository.saveAndFlush(curAnn) ;
+        emailService.sendEmailAfterUpdate(curAnn);
         return  modelMapper.map(curAnn,UpdateDTO.class);
     }
 
@@ -163,7 +165,6 @@ public class AnnouncementService {
             } else {
                 if((x.getCloseDate() != null && current.compareTo(x.getCloseDate())>0) && x.getAnnouncementDisplay().equals("Y") ){
                     filtered.add(x);
-//                    System.out.println("mode");
                 }
             }
         });

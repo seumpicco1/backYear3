@@ -1,5 +1,6 @@
 package com.example.intat3.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,4 +50,12 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "announcementOwner", referencedColumnName = "username")
     private User announcementOwner;
+
+    @Column(name = "notification")
+    private String notification;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "fileId")
+    private List<File> fileList;
+
 }

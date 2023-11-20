@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/announcements/pages").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/announcements/{id:[\\d+]}").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/categories").permitAll()
+                        .requestMatchers("/api/otps/**").permitAll()
+                        .requestMatchers("/api/files/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/users/**").hasRole("ADMIN")

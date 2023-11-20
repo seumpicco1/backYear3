@@ -26,4 +26,12 @@ public class Category {
     @JsonIgnore
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Announcement> announcementList;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+                },mappedBy = "categoryList")
+    private List<EmailAddress> emailAddresses;
 }
