@@ -1,10 +1,7 @@
 package com.example.intat3.services;
 
 import com.example.intat3.Dto.*;
-import com.example.intat3.Entity.Announcement;
-import com.example.intat3.Entity.Category;
-import com.example.intat3.Entity.Role;
-import com.example.intat3.Entity.User;
+import com.example.intat3.Entity.*;
 import com.example.intat3.repositories.AnnouncementRepository;
 import com.example.intat3.repositories.CategoryRepository;
 import com.example.intat3.repositories.UserRepository;
@@ -171,6 +168,7 @@ public class AnnouncementService {
         Collections.reverse(filtered);
         return filtered.stream().map(x->modelMapper.map(x, AllAnnouncementDto.class)).collect(Collectors.toList());
     }
+
 
 
 }

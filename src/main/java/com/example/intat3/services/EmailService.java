@@ -1,7 +1,6 @@
 package com.example.intat3.services;
 
 import com.example.intat3.Entity.Announcement;
-import com.example.intat3.Entity.Category;
 import com.example.intat3.Entity.EmailAddress;
 
 import java.util.List;

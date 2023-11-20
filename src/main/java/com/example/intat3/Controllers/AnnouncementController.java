@@ -3,12 +3,25 @@ package com.example.intat3.Controllers;
 
 import com.example.intat3.Dto.*;
 import com.example.intat3.services.AnnouncementService;
+import com.example.intat3.services.FileService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @CrossOrigin
@@ -19,15 +32,14 @@ public class AnnouncementController {
     @Autowired
     private AnnouncementService service;
 
+    @Autowired
+    private FileService fileService;
+
     @GetMapping
     public List<AllAnnouncementDto> getAllAnnouncement ( @RequestParam(required=false) String mode){
         boolean isAdmin = isAdminChecker();
         String username = getUsernameUser();
-//        try {
-//
-//        }catch (){
-//
-//        }
+
         if(isAdmin) {
             return service.getAllAnnouncement();
         }else if(mode!=null){
@@ -38,15 +50,32 @@ public class AnnouncementController {
     }
 
     @GetMapping("/{id}")
-    public AnnouncementDto getById(@PathVariable Integer id, @RequestParam(defaultValue = "false") boolean count){
+    public ResponseEntity<MultiValueMap<String, Object>> getById(@PathVariable Integer id, @RequestParam(defaultValue = "false") boolean count){
         String username = getUsernameUser();
-        return service.getAnnouncementById(id, count, username);
+        AnnouncementDto ann = service.getAnnouncementById(id, count, username);
+        ByteArrayResource resource = downloadFile(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"files.zip\"");
+        headers.setContentType(MediaType.MULTIPART_MIXED);
+
+        MultiValueMap<String,Object> body = new LinkedMultiValueMap();
+        body.add("Json",ann);
+        body.add("file",resource);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(body);
     }
 
     @PostMapping
-    public AnnouncementDto createAnnouncement(@Valid @RequestBody UpdateAnnouncementDto ann){
+    public AnnouncementDto createAnnouncement(@Valid @RequestBody UpdateAnnouncementDto ann, @RequestBody(required = false) MultipartFile[] file){
         String username = getUsernameUser();
-        return service.createAnn(ann, username);
+        AnnouncementDto newAnn = service.createAnn(ann, username);
+        if(file!=null){
+            fileService.uploadFile(file,newAnn.getId());
+        }
+        return newAnn;
     }
 
     @DeleteMapping ("/{id}")
@@ -56,9 +85,14 @@ public class AnnouncementController {
     }
 
     @PutMapping("/{id}")
-        public UpdateDTO updateProduct(@PathVariable  Integer id, @Valid @RequestBody UpdateAnnouncementDto ann) {
+        public UpdateDTO updateProduct(@PathVariable  Integer id, @Valid @RequestBody UpdateAnnouncementDto ann, @RequestBody(required = false) MultipartFile[] file) {
         String username = getUsernameUser();
-        return service.updateAnn( id, ann, username);
+        UpdateDTO newAnn = service.updateAnn( id, ann, username);
+        if(file!=null){
+            fileService.deleteFileByAnnouncement(id);
+            fileService.uploadFile(file, id);
+        }
+        return newAnn;
     }
 
     @GetMapping("/pages")
@@ -77,5 +111,25 @@ public class AnnouncementController {
 
     public String getUsernameUser(){
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    public ByteArrayResource downloadFile(Integer annId){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(baos)){
+            Map<String,byte[]> dataBytes = fileService.downloadFile(annId);
+            for(Map.Entry<String,byte[]> data : dataBytes.entrySet()){
+                ZipEntry zipEntry = new ZipEntry(data.getKey());
+                zipOutputStream.putNextEntry(zipEntry);
+                zipOutputStream.write(data.getValue());
+                zipOutputStream.closeEntry();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
+//        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"multiple_files.zip\"")
+//                .body(Resource);
+        return resource;
     }
 }

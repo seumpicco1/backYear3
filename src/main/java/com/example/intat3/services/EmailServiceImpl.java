@@ -6,13 +6,10 @@ import com.example.intat3.Entity.EmailAddress;
 import com.example.intat3.repositories.AnnouncementRepository;
 import com.example.intat3.repositories.EmailRepository;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,16 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Base64;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Base64;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,10 +50,6 @@ public class    EmailServiceImpl implements EmailService{
     public void sendSimpleMail(String email, String subject, String html) throws IOException {
         log.info("simple mail was call");
         try {
-//            SimpleMailMessage mailMessage = new SimpleMailMessage();
-//            mailMessage.setTo(email);
-//            mailMessage.setSubject(subject);
-//            mailMessage.setText(text);
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(email);
@@ -156,10 +146,7 @@ public class    EmailServiceImpl implements EmailService{
 
     @Override
     public void sendEmailAfterUpdate(Announcement announcement) {
-//            log.info(a.getAnnouncementTitle());
             List<EmailAddress> allEmail = repository.findByCategoryId(announcement.getCategory().getCategoryId());
-//                sendNotification(e.getEmail(),a.getCategory().getCategoryId());
-
                 try {
                     for (EmailAddress e : allEmail) {
                         log.info(e.getEmail());
@@ -179,13 +166,10 @@ public class    EmailServiceImpl implements EmailService{
     public void publishAnnouncementChecker() throws UnknownHostException {
         log.info("method call!");
         List<Announcement> publishAnn = announcementRepository.announcementPublishCheck();
-        log.info(String.valueOf(publishAnn.size()));
-//        log.info(readHtmlFileToString("template/email-template.html"));
         if(publishAnn!=null){
             for (Announcement a : publishAnn) {
                 log.info(a.getAnnouncementTitle());
                 List<EmailAddress> allEmail = repository.findByCategoryId(a.getCategory().getCategoryId());
-//                sendNotification(e.getEmail(),a.getCategory().getCategoryId());
                 for (EmailAddress e : allEmail) {
                     log.info(e.getEmail());
                     sendNotification(e.getEmail(),a.getCategory().getCategoryId());

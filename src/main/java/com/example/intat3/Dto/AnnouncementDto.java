@@ -1,10 +1,12 @@
 package com.example.intat3.Dto;
 
+import com.example.intat3.Entity.File;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Getter
 @Setter
