@@ -25,7 +25,8 @@ public class File {
     @Column(name = "filePath")
     private String filePath;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "announcementId")
 //    @Column(name = "announcementId")
     private Announcement announcement;

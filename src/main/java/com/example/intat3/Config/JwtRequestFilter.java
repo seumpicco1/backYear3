@@ -36,16 +36,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
         System.out.println(request.getHeader("Authorization"));
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")&& requestTokenHeader.length() > 15) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                System.out.println(1);
+//                System.out.println(1);
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                System.out.println(2);
-            } catch (IllegalArgumentException e) {
-                logger.warn("Unable to get JWT Token");
+//                System.out.println(2);
             } catch (ExpiredJwtException e) {
                 logger.warn("JWT Token has expired");
+            }  catch (Exception e) {
+                logger.warn("Unable to get JWT Token");
             }
 
         } else {

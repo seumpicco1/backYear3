@@ -11,38 +11,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
     @Autowired
     private FileService fileService;
 
-    @PostMapping("/upload")
-    public String uploadFile(@RequestBody MultipartFile[] file){
-        return fileService.uploadFile(file, 1);
+    @PostMapping("/upload/{id}")
+    public ResponseEntity uploadFile(@RequestParam List<MultipartFile> file,@PathVariable Integer id){
+        System.out.println(id);
+        return fileService.uploadFile(file, id);
     }
 
-    @GetMapping("/download/{annId}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Integer annId){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(baos)){
-            Map<String,byte[]> dataBytes = fileService.downloadFile(annId);
-            for(Map.Entry<String,byte[]> data : dataBytes.entrySet()){
-                ZipEntry zipEntry = new ZipEntry(data.getKey());
-                zipOutputStream.putNextEntry(zipEntry);
-                zipOutputStream.write(data.getValue());
-                zipOutputStream.closeEntry();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        ByteArrayResource Resource = new ByteArrayResource(baos.toByteArray());
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"multiple_files.zip\"")
-                .body(Resource);
-    }
+
 }

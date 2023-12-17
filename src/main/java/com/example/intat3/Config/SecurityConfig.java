@@ -54,9 +54,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(OPTIONS).permitAll() // allow CORS option calls for Swagger UI
                         .requestMatchers("/api/token").permitAll()
+                        .requestMatchers("/api/token/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/announcements").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/announcements/pages").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/announcements/{id:[\\d+]}").permitAll()
+//                        .requestMatchers(HttpMethod.GET,"/api/announcements/pages").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/announcements/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/categories").permitAll()
                         .requestMatchers("/api/otps/**").permitAll()
                         .requestMatchers("/api/files/**").permitAll()

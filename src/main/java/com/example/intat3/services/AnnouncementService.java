@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class AnnouncementService {
+
+    @Autowired
+    private FileService fileService;
     @Autowired
     private AnnouncementRepository announcementrepository;
     @Autowired
@@ -35,23 +38,11 @@ public class AnnouncementService {
     public AnnouncementDto getAnnouncementById(Integer announcementId, boolean count, String username  ) {
         Announcement a = announcementrepository.findById(announcementId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Announcement id " + announcementId +  " " + "does not exist !!!"));
-        System.out.println(username);
-        User user = null;
-        if(!username.contains("anonymousUser")&& username != null){
-            user = userRepository.findByUsername(username);
-            if(user.getRole().equals(Role.admin)){
-                return modelMapper.map(a,AnnouncementDto.class);
-            }
-            else if(!a.getAnnouncementOwner().getUsername().equals(user.getUsername())){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
-            }
-        }
-
         if (count) {
             a.setViewer(a.getViewer()+1);
             announcementrepository.saveAndFlush(a);
         }
-
+        System.out.println("test");
         return modelMapper.map(a,AnnouncementDto.class);
     }
 
@@ -61,6 +52,7 @@ public class AnnouncementService {
         Collections.reverse(aa);
         return aa.stream().map(x->modelMapper.map(x, AllAnnouncementDto.class)).collect(Collectors.toList());
     }
+
     @PreAuthorize("hasAnyRole('ADMIN','ANNOUNCER')")
     public List<AllAnnouncementDto> getAllAnnouncementByUser(String username){
         User user = userRepository.findByUsername(username);
@@ -69,6 +61,7 @@ public class AnnouncementService {
         return list.stream().map(x -> modelMapper.map(x,AllAnnouncementDto.class)).collect(Collectors.toList());
     }
 
+        @PreAuthorize("hasAnyRole('ADMIN','ANNOUNCER')")
     public AnnouncementDto createAnn( UpdateAnnouncementDto upAnn, String username) {
         if (upAnn.getAnnouncementDisplay() == null) {
             upAnn.setAnnouncementDisplay("N");
@@ -85,6 +78,7 @@ public class AnnouncementService {
         Announcement aa = modelMapper.map(upAnn,Announcement.class);
         aa.setCategory(cat);
         aa.setAnnouncementOwner(user);
+        aa.setNotification("N");
         announcementrepository.saveAndFlush(aa);
         return modelMapper.map(aa,AnnouncementDto.class);
     }
@@ -95,13 +89,14 @@ public class AnnouncementService {
         if(!username.contains("anonymousUser")){
             user = userRepository.findByUsername(username);
             if(user.getRole().equals(Role.admin)){
-                announcementrepository.delete(a);
+                    fileService.deleteFileByAnnouncement(id);
+                    announcementrepository.delete(a);
                 return;
             }else if(!a.getAnnouncementOwner().getUsername().equals(user.getUsername())){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Forbidden");
             }
         }
-        announcementrepository.delete(a);
+//        announcementrepository.delete(a);
 
     }
 

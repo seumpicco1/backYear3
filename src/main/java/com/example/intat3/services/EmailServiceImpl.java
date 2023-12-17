@@ -128,7 +128,7 @@ public class    EmailServiceImpl implements EmailService{
         Base64.Encoder enc = Base64.getEncoder();
         String word = email+"&"+catId;
         String encodeStr = enc.encodeToString(word.getBytes());
-        String unsubLink = "http://localhost:8080"+"/api/unsub?link="+encodeStr;
+        String unsubLink = "http://localhost:8080"+"/api/otps/unsub?encode="+encodeStr;
         String body = "You have a new notification for SIT ANNOUNCEMENT";
         String subject = "Notification";
         String cat = catService.getCategory(catId).getCategoryName();
@@ -162,7 +162,7 @@ public class    EmailServiceImpl implements EmailService{
 
 
 
-    @Scheduled(fixedRate = 1000*60)
+//    @Scheduled(fixedRate = 1000*60)
     public void publishAnnouncementChecker() throws UnknownHostException {
         log.info("method call!");
         List<Announcement> publishAnn = announcementRepository.announcementPublishCheck();
@@ -197,11 +197,8 @@ public class    EmailServiceImpl implements EmailService{
     @Override
     public void unSubscribe(String email, Integer catId){
         EmailAddress emails =repository.findByEmail(email);
-        for (Category c : emails.getCategoryList()){
-            if(c.getCategoryId()==catId){
-                emails.getCategoryList().remove(c);
-            }
-        }
+        System.out.println(emails.getEmail());
+        emails.getCategoryList().removeIf(cat ->( cat.getCategoryId()==catId) );
         repository.saveAndFlush(emails);
     }
 }

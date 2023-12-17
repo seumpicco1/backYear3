@@ -55,7 +55,7 @@ public class Announcement {
     private String notification;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "fileId")
+    @OneToMany(mappedBy = "fileId", cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
     private List<File> fileList;
 
 }

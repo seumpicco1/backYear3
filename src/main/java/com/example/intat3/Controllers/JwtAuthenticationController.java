@@ -89,6 +89,30 @@ public class JwtAuthenticationController {
 
     }
 
+    @GetMapping("/checkToken")
+    public ResponseEntity<?> getCheckToken(HttpServletRequest request) throws Exception{
+        System.out.println("get");
+        String rawRefreshToken = request.getHeader("Authorization");
+
+        String username = null;
+        String refreshToken = null;
+        if(rawRefreshToken != null && rawRefreshToken.startsWith("Bearer ") && rawRefreshToken.length() > 7){
+            refreshToken = rawRefreshToken.substring(7);
+            try {
+                username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+                return new ResponseEntity<>("Token is not expired", HttpStatus.OK);
+            }catch (ExpiredJwtException e){
+                System.out.println(e.getMessage());
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"JWT Token has expired");
+            }
+            catch (Exception e){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
+            }
+        }else {
+            return new ResponseEntity<>("No Token", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationException(ResponseStatusException ex, WebRequest request) {
